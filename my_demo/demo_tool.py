@@ -12,22 +12,6 @@ from tool_registry import dispatch_tool, get_tools
 MAX_LENGTH = 8192
 TRUNCATE_LENGTH = 1024
 
-EXAMPLE_TOOL = {
-    "name": "get_current_weather",
-    "description": "Get the current weather in a given location",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "location": {
-                "type": "string",
-                "description": "The city and state, e.g. San Francisco, CA",
-            },
-            "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
-        },
-        "required": ["location"],
-    }
-}
-
 client = get_client()
 
 def tool_call(*args, **kwargs) -> dict:
@@ -48,7 +32,6 @@ def extract_code(text: str) -> str:
     matches = re.findall(pattern, text, re.DOTALL)
     return matches[-1][1]
 
-# Append a conversation into history, while show it in a new markdown block
 def append_conversation(
     conversation: Conversation,
     history: list[Conversation],
@@ -58,23 +41,7 @@ def append_conversation(
     conversation.show(placeholder)
 
 def main(top_p: float, temperature: float, prompt_text: str, repetition_penalty: float):
-    manual_mode = st.toggle('Manual mode',
-        help='Define your tools in YAML format. You need to supply tool call results manually.'
-    )
-
-    if manual_mode:
-        with st.expander('Tools'):
-            tools = st.text_area(
-                'Define your tools in YAML format here:',
-                yaml.safe_dump([EXAMPLE_TOOL], sort_keys=False),
-                height=400,
-            )
-        tools = yaml_to_dict(tools)
-
-        if not tools:
-            st.error('YAML format error in tools definition')
-    else:
-        tools = get_tools()
+    tools = get_tools()
 
     if 'tool_history' not in st.session_state:
         st.session_state.tool_history = []
@@ -85,7 +52,6 @@ def main(top_p: float, temperature: float, prompt_text: str, repetition_penalty:
 
     for conversation in history:
         conversation.show()
-
     if prompt_text:
         prompt_text = prompt_text.strip()
         role = st.session_state.calling_tool and Role.OBSERVATION or Role.USER
