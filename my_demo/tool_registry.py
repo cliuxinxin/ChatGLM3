@@ -3,7 +3,8 @@ import inspect
 from pprint import pformat
 import traceback
 from types import GenericAlias
-from typing import get_origin, Annotated
+from typing import get_origin, Annotated,get_args
+import hashlib
 
 _TOOL_HOOKS = {}
 _TOOL_DESCRIPTIONS = {}
@@ -13,6 +14,7 @@ def register_tool(func: callable):
     tool_description = inspect.getdoc(func).strip()
     python_params = inspect.signature(func).parameters
     tool_params = []
+
     for name, param in python_params.items():
         annotation = param.annotation
         if annotation is inspect.Parameter.empty:
@@ -20,7 +22,15 @@ def register_tool(func: callable):
         if get_origin(annotation) != Annotated:
             raise TypeError(f"Annotation type for `{name}` must be typing.Annotated")
         
-        typ, (description, required) = annotation.__origin__, annotation.__metadata__
+        # 获取原始类型和元数据
+        typ = get_origin(annotation)
+        metadata = get_args(annotation)[1]  # 获取第二个元素，即元数据
+
+        # 检查元数据是否为两个元素的元组
+        if not isinstance(metadata, tuple) or len(metadata) != 2:
+            raise TypeError(f"Metadata for `{name}` must be a tuple with two elements (description, required)")
+
+        description, required = metadata
         typ: str = str(typ) if isinstance(typ, GenericAlias) else typ.__name__
         if not isinstance(description, str):
             raise TypeError(f"Description for `{name}` must be a string")
@@ -33,6 +43,7 @@ def register_tool(func: callable):
             "type": typ,
             "required": required
         })
+
     tool_def = {
         "name": tool_name,
         "description": tool_description,
@@ -62,8 +73,8 @@ def get_tools() -> dict:
 
 @register_tool
 def random_number_generator(
-    seed: Annotated[int, 'The random seed used by the generator', True], 
-    range: Annotated[tuple[int, int], 'The range of the generated numbers', True],
+    seed: Annotated[int, ("The random seed used by the generator", True)], 
+    range: Annotated[tuple[int, int], ("The range of the generated numbers", True)],
 ) -> int:
     """
     Generates a random number x, s.t. range[0] <= x < range[1]
@@ -75,17 +86,16 @@ def random_number_generator(
     if not isinstance(range[0], int) or not isinstance(range[1], int):
         raise TypeError("Range must be a tuple of integers")
 
-    import random
-    return random.Random(seed).randint(*range)
+    random.seed(seed)
+    return random.randint(range[0], range[1])
 
 @register_tool
 def get_weather(
-    city_name: Annotated[str, 'The name of the city to be queried', True],
+    city_name: Annotated[str, ("The name of the city to be queried", True)],
 ) -> str:
     """
     Get the current weather for `city_name`
     """
-
     if not isinstance(city_name, str):
         raise TypeError("City name must be a string")
 
@@ -103,6 +113,18 @@ def get_weather(
         ret = "Error encountered while fetching weather data!\n" + traceback.format_exc() 
 
     return str(ret)
+
+
+@register_tool
+def generate_md5(input_string: Annotated[str, ("The input string to hash", True)]) -> str:
+    """
+    Generate MD5 hash of the provided string.
+    """
+    if not isinstance(input_string, str):
+        raise TypeError("Input string must be a string")
+
+    return hashlib.md5(input_string.encode()).hexdigest()
+
 
 if __name__ == "__main__":
     print(dispatch_tool("get_weather", {"city_name": "beijing"}))
