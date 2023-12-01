@@ -128,23 +128,20 @@ def main(top_p: float, temperature: float, prompt_text: str, repetition_penalty:
                             
                             output_text = ''
                             
-                            if manual_mode:
-                                st.info('Please provide tool call results below:')
-                                return
-                            else:
-                                with markdown_placeholder:
-                                    with st.spinner(f'Calling tool {tool}...'):
-                                        observation = dispatch_tool(tool, args)
 
-                                if len(observation) > TRUNCATE_LENGTH:
-                                    observation = observation[:TRUNCATE_LENGTH] + ' [TRUNCATED]'
-                                append_conversation(Conversation(
-                                    Role.OBSERVATION, observation
-                                ), history, markdown_placeholder)
-                                message_placeholder = placeholder.chat_message(name="assistant", avatar="assistant")
-                                markdown_placeholder = message_placeholder.empty()
-                                st.session_state.calling_tool = False
-                                break
+                            with markdown_placeholder:
+                                with st.spinner(f'Calling tool {tool}...'):
+                                    observation = dispatch_tool(tool, args)
+
+                            if len(observation) > TRUNCATE_LENGTH:
+                                observation = observation[:TRUNCATE_LENGTH] + ' [TRUNCATED]'
+                            append_conversation(Conversation(
+                                Role.OBSERVATION, observation
+                            ), history, markdown_placeholder)
+                            message_placeholder = placeholder.chat_message(name="assistant", avatar="assistant")
+                            markdown_placeholder = message_placeholder.empty()
+                            st.session_state.calling_tool = False
+                            
                         case _:
                             st.error(f'Unexpected special token: {token.text.strip()}')
                             return
