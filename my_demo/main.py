@@ -28,6 +28,7 @@ with st.sidebar:
     # 清空按钮
     if st.button("清空聊天"):
         st.session_state['chat_history'] = []
+        st.session_state['tool_history'] = []
 
 prompt_text = st.chat_input(
     'Interact with ChatGLM3!',
