@@ -1,12 +1,16 @@
 import streamlit as st
 import demo_tool
 
-st.set_page_config(
-    page_title="ChatGLM3 Demo",
-    page_icon=":robot:",
-    layout='centered',
-    initial_sidebar_state='expanded',
-)
+@st.experimental_singleton
+def setup_page():
+    st.set_page_config(
+        page_title="ChatGLM3 Demo",
+        page_icon=":robot:",
+        layout='centered',
+        initial_sidebar_state='expanded',
+    )
+
+setup_page()
 
 # 设置标题
 st.title("ChatGLM3 Demo")
@@ -34,17 +38,20 @@ prompt_text = st.chat_input(
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
 
-# 当用户提交时，将输入添加到聊天历史
-if prompt_text:
-    st.session_state['chat_history'].append(prompt_text)
+# 创建并排的列
+col1, col2 = st.columns([5, 1])
+
+with col1:
+    prompt_text = st.chat_input('Interact with ChatGLM3!', key='chat_input')
+
+with col2:
+    if st.button("清空聊天"):
+        st.session_state['chat_history'] = []
 
 # 显示聊天历史
 for message in st.session_state['chat_history']:
     st.text_area("", message, key=message)
 
-# 清空按钮
-if st.button("清空聊天"):
-    st.session_state['chat_history'] = []
 
 # 如果有新的输入，调用 Tool 功能
 if prompt_text:
