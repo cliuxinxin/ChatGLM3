@@ -12,7 +12,7 @@ from config import *
 _TOOL_HOOKS = {}
 _TOOL_DESCRIPTIONS = {}
 
-embeddings = HuggingFaceEmbeddings(model_name='distiluse-base-multilingual-cased-v1',
+embeddings = HuggingFaceEmbeddings(model_name='model',
                                        model_kwargs={'device': 'cpu'})
 
 db = FAISS.load_local(DB_FAISS_PATH, embeddings)

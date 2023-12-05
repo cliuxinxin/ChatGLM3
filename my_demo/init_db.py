@@ -21,7 +21,7 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
 splits = text_splitter.split_documents(documents)
 print(len(splits), splits[0])
 
-embeddings = HuggingFaceEmbeddings(model_name='distiluse-base-multilingual-cased-v1',
+embeddings = HuggingFaceEmbeddings(model_name='model',
                                        model_kwargs={'device': 'cpu'})
 
 db = FAISS.from_documents(splits, embeddings)
