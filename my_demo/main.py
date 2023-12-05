@@ -1,14 +1,12 @@
 import streamlit as st
 import demo_tool
 
-
 st.set_page_config(
     page_title="ChatGLM3 Demo",
     page_icon=":robot:",
     layout='centered',
     initial_sidebar_state='expanded',
 )
-
 
 # 设置标题
 st.title("ChatGLM3 Demo")
@@ -27,6 +25,10 @@ with st.sidebar:
         'repetition_penalty', 0.0, 2.0, 1.2, step=0.01
     )
 
+    # 清空按钮
+    if st.button("清空聊天"):
+        st.session_state['chat_history'] = []
+
 prompt_text = st.chat_input(
     'Interact with ChatGLM3!',
     key='chat_input',
@@ -37,13 +39,10 @@ if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
 
 
-# 清空按钮
-if st.button("清空聊天"):
-    st.session_state['chat_history'] = []
-
 # 显示聊天历史
-for message in st.session_state['chat_history']:
-    st.text_area("", message, key=message)
+if st.session_state['chat_history']:
+    for message in st.session_state['chat_history']:
+        st.text_area("", message, key=message)
 
 
 # 如果有新的输入，调用 Tool 功能
