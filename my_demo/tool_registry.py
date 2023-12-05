@@ -5,9 +5,17 @@ import traceback
 from types import GenericAlias
 from typing import get_origin, Annotated,get_args
 import hashlib
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+from config import *
 
 _TOOL_HOOKS = {}
 _TOOL_DESCRIPTIONS = {}
+
+embeddings = HuggingFaceEmbeddings(model_name='distiluse-base-multilingual-cased-v1',
+                                       model_kwargs={'device': 'cpu'})
+
+db = FAISS.load_local(DB_FAISS_PATH, embeddings)
 
 def register_tool(func: callable):
     tool_name = func.__name__
@@ -85,7 +93,8 @@ def random_number_generator(
         raise TypeError("Range must be a tuple")
     if not isinstance(range[0], int) or not isinstance(range[1], int):
         raise TypeError("Range must be a tuple of integers")
-
+    
+    import random
     random.seed(seed)
     return random.randint(range[0], range[1])
 
@@ -124,6 +133,30 @@ def generate_md5(input_string: Annotated[str, ("The input string to hash", True)
         raise TypeError("Input string must be a string")
 
     return hashlib.md5(input_string.encode()).hexdigest()
+
+
+@register_tool
+def search_knowledge_base(
+    query_text: Annotated[str, ("The text to query in the net security knowledge base", True)]
+) -> str:
+    """
+    Search the knowledge base for documents similar to the provided query text.
+    """
+    if not isinstance(query_text, str):
+        raise TypeError("Query text must be a string")
+
+    try:
+        # 使用 `embed_query` 生成查询文本的嵌入向量
+        query_embedding = embeddings.embed_query(query_text)
+
+        # 使用 `similarity_search_by_vector` 在FAISS索引中搜索最相似的文档
+        similar_documents = db.similarity_search_by_vector(query_embedding, k=3)  # k指定返回的相似文档数量
+
+        # 组合相似文档的内容
+        return '\n\n'.join([doc.content for doc in similar_documents])
+    except Exception as e:
+        return f"Error encountered while searching the knowledge base: {str(e)}"
+
 
 
 if __name__ == "__main__":
