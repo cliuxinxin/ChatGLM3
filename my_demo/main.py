@@ -30,5 +30,22 @@ prompt_text = st.chat_input(
     key='chat_input',
 )
 
-# 直接调用 Tool 功能
-demo_tool.main(top_p, temperature, prompt_text, repetition_penalty)
+# 初始化或获取聊天历史
+if 'chat_history' not in st.session_state:
+    st.session_state['chat_history'] = []
+
+# 当用户提交时，将输入添加到聊天历史
+if prompt_text:
+    st.session_state['chat_history'].append(prompt_text)
+
+# 显示聊天历史
+for message in st.session_state['chat_history']:
+    st.text_area("", message, key=message)
+
+# 清空按钮
+if st.button("清空聊天"):
+    st.session_state['chat_history'] = []
+
+# 如果有新的输入，调用 Tool 功能
+if prompt_text:
+    demo_tool.main(top_p, temperature, prompt_text, repetition_penalty)
