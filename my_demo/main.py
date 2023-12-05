@@ -1,16 +1,14 @@
 import streamlit as st
 import demo_tool
 
-st.cache_resource 
-def setup_page():
-    st.set_page_config(
-        page_title="ChatGLM3 Demo",
-        page_icon=":robot:",
-        layout='centered',
-        initial_sidebar_state='expanded',
-    )
 
-setup_page()
+st.set_page_config(
+    page_title="ChatGLM3 Demo",
+    page_icon=":robot:",
+    layout='centered',
+    initial_sidebar_state='expanded',
+)
+
 
 # 设置标题
 st.title("ChatGLM3 Demo")
