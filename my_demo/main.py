@@ -1,7 +1,7 @@
 import streamlit as st
 import demo_tool
 
-@st.experimental_singleton
+st.cache_resource 
 def setup_page():
     st.set_page_config(
         page_title="ChatGLM3 Demo",
