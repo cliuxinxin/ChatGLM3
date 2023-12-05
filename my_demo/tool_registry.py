@@ -150,7 +150,7 @@ def search_knowledge_base(
         query_embedding = embeddings.embed_query(query_text)
 
         # 使用 `similarity_search_by_vector` 在FAISS索引中搜索最相似的文档
-        similar_documents = db.similarity_search_by_vector(query_embedding, k=3)  # k指定返回的相似文档数量
+        similar_documents = db.similarity_search_by_vector(query_embedding, k=4)  # k指定返回的相似文档数量
 
         # 组合相似文档的内容
         return '\n\n'.join([doc.page_content for doc in similar_documents])

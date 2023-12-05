@@ -39,6 +39,5 @@ prompt_text = st.chat_input(
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
 
-# 如果有新的输入，调用 Tool 功能
-if prompt_text:
-    demo_tool.main(top_p, temperature, prompt_text, repetition_penalty)
+
+demo_tool.main(top_p, temperature, prompt_text, repetition_penalty)
