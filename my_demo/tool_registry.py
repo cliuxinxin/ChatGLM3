@@ -80,25 +80,6 @@ def get_tools() -> dict:
 # Tool Definitions
 
 @register_tool
-def random_number_generator(
-    seed: Annotated[int, ("The random seed used by the generator", True)], 
-    range: Annotated[tuple[int, int], ("The range of the generated numbers", True)],
-) -> int:
-    """
-    Generates a random number x, s.t. range[0] <= x < range[1]
-    """
-    if not isinstance(seed, int):
-        raise TypeError("Seed must be an integer")
-    if not isinstance(range, tuple):
-        raise TypeError("Range must be a tuple")
-    if not isinstance(range[0], int) or not isinstance(range[1], int):
-        raise TypeError("Range must be a tuple of integers")
-    
-    import random
-    random.seed(seed)
-    return random.randint(range[0], range[1])
-
-@register_tool
 def get_weather(
     city_name: Annotated[str, ("The name of the city to be queried", True)],
 ) -> str:
@@ -157,6 +138,23 @@ def search_knowledge_base(
     except Exception as e:
         return f"Error encountered while searching the knowledge base: {str(e)}"
 
+@register_tool
+def query_ip(
+    ip_address: Annotated[str, ("The IP address to query", True)]
+) -> str:
+    """
+    Query information about a given IP address.
+    """
+    if not isinstance(ip_address, str):
+        raise TypeError("IP address must be a string")
+
+    import requests
+    try:
+        response = requests.get(f"http://ip-api.com/json/{ip_address}")
+        response.raise_for_status()
+        return str(response.json())
+    except Exception as e:
+        return f"Error encountered while querying IP address: {str(e)}"
 
 
 if __name__ == "__main__":
