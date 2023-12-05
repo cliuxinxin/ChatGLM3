@@ -153,7 +153,7 @@ def search_knowledge_base(
         similar_documents = db.similarity_search_by_vector(query_embedding, k=3)  # k指定返回的相似文档数量
 
         # 组合相似文档的内容
-        return '\n\n'.join([doc.content for doc in similar_documents])
+        return '\n\n'.join([doc.page_content for doc in similar_documents])
     except Exception as e:
         return f"Error encountered while searching the knowledge base: {str(e)}"
 

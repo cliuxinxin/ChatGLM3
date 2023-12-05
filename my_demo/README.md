@@ -27,7 +27,8 @@ ipython kernel install --name chatglm3-demo --user
 运行以下命令在本地加载模型并启动 demo：
 
 ```bash
-streamlit run main.py
+python3.10 -m streamlit run main.py --server.port 6006
+
 ```
 
 之后即可从命令行中看到 demo 的地址，点击即可访问。初次访问需要下载并加载模型，可能需要花费一定时间。
