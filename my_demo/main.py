@@ -1,5 +1,5 @@
 import streamlit as st
-import demo_tool
+
 
 st.set_page_config(
     page_title="ChatGLM3 Demo",
@@ -7,6 +7,8 @@ st.set_page_config(
     layout='centered',
     initial_sidebar_state='expanded',
 )
+
+import demo_tool
 
 # 设置标题
 st.title("ChatGLM3 Demo")
