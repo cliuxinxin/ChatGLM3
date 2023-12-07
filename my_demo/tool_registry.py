@@ -150,7 +150,7 @@ def query_ip(
 
     import requests
     try:
-        response = requests.get(f"http://ip-api.com/json/{ip_address}")
+        response = requests.get(f"worker-tight-flower-09d8.cliuxinxin.workers.dev/?ip={ip_address}")
         response.raise_for_status()
         return str(response.json())
     except Exception as e:
